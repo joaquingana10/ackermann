@@ -1620,7 +1620,9 @@ async function saveTaskForm(){
       if(idx>-1){
         const existing=tasks[idx];
         tasks[idx]={...existing,titulo,estado,fase,fecha,notas,archivos:[...(existing.archivos||[]),...archivosNuevos]};
-        await apiPost({action:'update',task:tasks[idx]});
+        const res=await apiPost({action:'update',task:tasks[idx]});
+        const resData=await res.json();
+        if(!resData.ok){showToast('Error API: '+(resData.error||'desconocido'));btn.disabled=false;btn.textContent='Guardar tarea';return;}
       }
     }else{
       const newTask={id:uid(),titulo,cliente:clientName,estado,fase,fecha,notas,prioridad:'media',encargados:[],archivos:archivosNuevos,comentarios:[],visible_cliente:'Sí',creadoPor:clientName,modificadoPor:clientName};
