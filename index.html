@@ -977,7 +977,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
   <div class="modal-card">
     <div class="modal-handle"></div>
     <button class="modal-close" onclick="closeModal()">×</button>
-    <button class="modal-edit-btn" id="m-edit-btn" onclick="closeModal();openTaskForm(currentTask&&currentTask.id)">Editar</button>
+    <button class="modal-edit-btn" id="m-edit-btn" onclick="const _id=currentTask&&currentTask.id;closeModal();openTaskForm(_id)">Editar</button>
     <div class="modal-scroll" id="modal-scroll">
       <div id="m-status-badge" class="modal-status-badge"></div>
       <div class="modal-title" id="m-title"></div>
