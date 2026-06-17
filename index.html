@@ -169,6 +169,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 .task-card-date.date-soon{color:#d97706}
 .task-card-date.date-ok{color:#059669}
 .task-card-stats{display:flex;align-items:center;gap:10px}
+.fase-chip{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;letter-spacing:.04em;font-family:var(--font-mono);margin-bottom:8px;margin-left:2px}
+.fase-chip.f0{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1}
+.fase-chip.f1{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.fase-chip.f2{background:#f0fdf4;color:#047857;border:1px solid #bbf7d0}
+.fase-chip.f3{background:#fefce8;color:#a16207;border:1px solid #fde68a}
+.fase-chip.f4{background:#fdf4ff;color:#7e22ce;border:1px solid #e9d5ff}
+.task-card.has-fase-0{border-left:3px solid #94a3b8}
+.task-card.has-fase-1{border-left:3px solid #3b82f6}
+.task-card.has-fase-2{border-left:3px solid #10b981}
+.task-card.has-fase-3{border-left:3px solid #f59e0b}
+.task-card.has-fase-4{border-left:3px solid #a855f7}
 .task-card-stat{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted2);font-weight:500}
 .chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;padding:3px 9px;border-radius:99px;white-space:nowrap;font-weight:500}
 .chip-ok{background:#f0fdf4;color:#059669}.chip-soon{background:#fff7ed;color:#d97706}.chip-over{background:#fef2f2;color:#dc2626}.chip-none{background:#f4f3ee;color:var(--muted)}.chip-file{background:#f0f4ff;color:#4f46e5}.chip-comment{background:#f4f3ee;color:var(--muted)}
@@ -996,6 +1007,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
           <option value="Resuelta">Entregado ✓</option>
         </select>
       </div>
+      <div class="form-group"><label class="form-label">Fase</label>
+        <select class="form-select" id="ff-fase">
+          <option value="">Sin fase</option>
+          <option value="0">Fase 0</option>
+          <option value="1">Fase 1</option>
+          <option value="2">Fase 2</option>
+          <option value="3">Fase 3</option>
+          <option value="4">Fase 4</option>
+        </select>
+      </div>
       <div class="form-group"><label class="form-label">Fecha de entrega</label><input class="form-input" id="ff-fecha" type="date"></div>
       <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="ff-notas" placeholder="Detalles..."></textarea></div>
       <div class="form-group">
@@ -1471,9 +1492,11 @@ function renderCol(id,items){
       const label=d<0?'Vencida':d===0?'Hoy':d===1?'Mañana':fmtDate(t.fecha);
       dateHtml='<span class="task-card-date '+cls+'">'+label+'</span>';
     }
-    return'<div class="task-card '+colClass+'" data-id="'+t.id+'" draggable="true">'
-      +'<div class="task-card-badge">'+badgeText+'</div>'
-      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">'
+    const faseChip=t.fase!==undefined&&t.fase!==''?'<span class="fase-chip f'+t.fase+'">Fase '+t.fase+'</span>':'';
+    const faseClass=t.fase!==undefined&&t.fase!==''?' has-fase-'+t.fase:'';
+    return'<div class="task-card '+colClass+faseClass+'" data-id="'+t.id+'" draggable="true">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="task-card-badge">'+badgeText+'</div>'+faseChip+'</div>'
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-top:6px">'
       +'<div class="task-card-title">'+esc(t.titulo)+'</div>'
       +'<button class="task-del-btn" onclick="event.stopPropagation();deleteTask(\''+t.id+'\')" title="Eliminar">×</button>'
       +'</div>'
@@ -1522,6 +1545,7 @@ function openTaskForm(taskId){
   document.getElementById('form-modal-title').textContent=t?'Editar tarea':'Nueva tarea';
   document.getElementById('ff-titulo').value=t?t.titulo:'';
   document.getElementById('ff-estado').value=t?t.estado:'Pendiente';
+  document.getElementById('ff-fase').value=t?(t.fase||''):'';
   document.getElementById('ff-fecha').value=t?(t.fecha||''):'';
   document.getElementById('ff-notas').value=t?(t.notas||''):'';
   document.getElementById('btn-form-save').disabled=false;
@@ -1569,6 +1593,7 @@ async function saveTaskForm(){
   const btn=document.getElementById('btn-form-save');
   btn.disabled=true;btn.textContent='Guardando...';
   const estado=document.getElementById('ff-estado').value;
+  const fase=document.getElementById('ff-fase').value;
   const fecha=document.getElementById('ff-fecha').value;
   const notas=document.getElementById('ff-notas').value.trim();
   try{
@@ -1591,11 +1616,11 @@ async function saveTaskForm(){
       const idx=tasks.findIndex(t=>t.id===editingFormId);
       if(idx>-1){
         const existing=tasks[idx];
-        tasks[idx]={...existing,titulo,estado,fecha,notas,archivos:[...(existing.archivos||[]),...archivosNuevos]};
+        tasks[idx]={...existing,titulo,estado,fase,fecha,notas,archivos:[...(existing.archivos||[]),...archivosNuevos]};
         await apiPost({action:'update',task:tasks[idx]});
       }
     }else{
-      const newTask={id:uid(),titulo,cliente:clientName,estado,fecha,notas,prioridad:'media',encargados:[],archivos:archivosNuevos,comentarios:[],visible_cliente:'Sí',creadoPor:clientName,modificadoPor:clientName};
+      const newTask={id:uid(),titulo,cliente:clientName,estado,fase,fecha,notas,prioridad:'media',encargados:[],archivos:archivosNuevos,comentarios:[],visible_cliente:'Sí',creadoPor:clientName,modificadoPor:clientName};
       tasks.push(newTask);
       await apiPost({action:'create',task:newTask});
     }
