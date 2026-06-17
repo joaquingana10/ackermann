@@ -379,6 +379,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
 @media(min-width:700px){.modal-handle{display:none}}
 .modal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:#f4f3ee;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:10}
 .modal-close:hover{background:var(--border);color:var(--text)}
+.modal-edit-btn{position:absolute;top:16px;right:58px;padding:6px 14px;border-radius:8px;background:var(--accent-bg);border:1px solid var(--accent);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-sans);transition:all .15s;z-index:10}
+.modal-edit-btn:hover{background:var(--accent);color:#fff}
 .modal-scroll{overflow-y:auto;flex:1;padding:24px 28px 0}
 @media(max-width:700px){.modal-scroll{padding:16px 20px 0}}
 .modal-status-badge{display:inline-flex;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:99px;font-weight:600;margin-bottom:12px}
@@ -975,6 +977,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-si
   <div class="modal-card">
     <div class="modal-handle"></div>
     <button class="modal-close" onclick="closeModal()">×</button>
+    <button class="modal-edit-btn" id="m-edit-btn" onclick="closeModal();openTaskForm(currentTask&&currentTask.id)">Editar</button>
     <div class="modal-scroll" id="modal-scroll">
       <div id="m-status-badge" class="modal-status-badge"></div>
       <div class="modal-title" id="m-title"></div>
