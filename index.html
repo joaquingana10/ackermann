@@ -1224,7 +1224,7 @@ async function apiPost(payload) {
 const ENTRY_COLORS = ['#f59e0b','#10b981','#6366f1','#ec4899','#ef4444','#0ea5e9','#8b5cf6','#14b8a6'];
 
 const urlParams = new URLSearchParams(location.search);
-clientSlug = (urlParams.get('c') || '').trim();
+clientSlug = (urlParams.get('c') || 'ackermann-propiedades').trim();
 
 // ─── INIT ───
 let storedCode = '';
